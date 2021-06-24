@@ -24,17 +24,23 @@ import java.util.StringTokenizer;
 public class Demo {
     public static class Map extends
             Mapper<LongWritable, Text, Text, IntWritable> {
-        private final static IntWritable one = new IntWritable(1);
         private Text word = new Text();
 
         @Override
         public void map(LongWritable key, Text value, Context context)
                 throws IOException, InterruptedException {
             String[] strs = value.toString().split("\\r");
-//            int len = value.toString().split("\\r").length;
+            int sum = 0;
             for (int i = 0; i < strs.length; i++) {
-
+                String[] data = strs[i].split("//|");
+                for (int j = 0; j < data.length; j++) {
+                    if (j == 2){
+                        sum += Integer.valueOf(data[j]);
+                    }
+                }
             }
+            word.set("sum(2)");
+            context.write(word, new IntWritable(sum));
         }
     }
 
@@ -59,7 +65,7 @@ public class Demo {
          */
         Configuration conf = new Configuration();
 
-        Job job = new Job(conf, "wordcount");
+        Job job = new Job(conf, "demo");
         job.setJarByClass(Demo.class);
 
         job.setOutputKeyClass(Text.class);
